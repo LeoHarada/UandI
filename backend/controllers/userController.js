@@ -1,6 +1,7 @@
 import User from "../models/userModel.js";
 import bcrypt from "bcryptjs";
 import tokenAndCookie from "../utils/helpers/tokenAndCookie.js";
+import { v2 as cloudinary } from "cloudinary";
 
 const getUserProfile = async (req, res) => {
     const { username } = req.params;
@@ -45,6 +46,8 @@ const signupUser = async (req, res) => {
                 name: newUser.name,
                 email: newUser.email,
                 username: newUser.username,
+                bio: newUser.bio,
+                profilePic: newUser.profilePic,
             });
         } else {
             res.status(400).json({ error: "Invalid user data" });
@@ -77,6 +80,8 @@ const loginUser = async (req, res) => {
             name: user.name,
             email: user.email,
             username: user.username,
+            bio: user.bio,
+            profilePic: user.profilePic,
         });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -137,8 +142,9 @@ const followUnfollow = async (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-    const { name, email, username, password, profilePic, bio } = req.body;
+    const { name, email, username, password, bio } = req.body;
     const userId = req.user._id;
+    let { profilePic } = req.body;
 
     try {
         let user = await User.findById(userId);
@@ -155,6 +161,18 @@ const updateUser = async (req, res) => {
             user.password = hashedPassword;
         }
 
+        if (profilePic) {
+            if (user.profilePic) {
+                await cloudinary.uploader.destroy(
+                    user.profilePic.split("/").pop().split(".")[0]
+                );
+            }
+            const uploadedResponse = await cloudinary.uploader.upload(
+                profilePic
+            );
+            profilePic = uploadedResponse.secure_url;
+        }
+
         user.name = name || user.name;
         user.email = email || user.email;
         user.username = username || user.username;
@@ -162,11 +180,9 @@ const updateUser = async (req, res) => {
         user.bio = bio || user.bio;
 
         user = await user.save();
+        user.password = null;
 
-        res.status(200).json({
-            message: "Profile updated successfully.",
-            user,
-        });
+        res.status(200).json(user);
     } catch (err) {
         res.status(500).json({ error: err.message });
         console.log("Error in updateUser: ", err.message);
