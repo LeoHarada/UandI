@@ -5,7 +5,7 @@ import { BsInstagram } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import { Menu, MenuButton, MenuItem, MenuList } from "@chakra-ui/menu";
 import { Portal } from "@chakra-ui/portal";
-import { useToast } from "@chakra-ui/toast";
+import { useToast, Button } from "@chakra-ui/react";
 import userAtom from "../atoms/userAtom";
 import { useRecoilValue } from "recoil";
 import { Link as RouterLink } from "react-router-dom";
@@ -77,7 +77,7 @@ const UserHeader = ({ user }) => {
                         {user.name}
                     </Text>
                     <Flex gap={2} alignItems={"center"}>
-                        <Text fontSize={"sm"}>{user.username}</Text>
+                        <Text fontSize={"sm"}>@{user.username}</Text>
                         <Text
                             fontSize={"xs"}
                             bg={"gray.dark"}
@@ -85,7 +85,7 @@ const UserHeader = ({ user }) => {
                             p={1}
                             borderRadius={"full"}
                         >
-                            threads.net
+                            UandI
                         </Text>
                     </Flex>
                 </Box>
@@ -100,7 +100,7 @@ const UserHeader = ({ user }) => {
                     {!user.profilePic && (
                         <Avatar
                             name={user.name}
-                            src="https://bit.ly/broken-link"
+                            src="https://static.vecteezy.com/system/resources/thumbnails/005/544/770/small/profile-icon-design-free-vector.jpg"
                             size={{ base: "md", md: "xl" }}
                         />
                     )}

@@ -1,5 +1,3 @@
-"use client";
-
 import {
     Button,
     Flex,
@@ -154,7 +152,7 @@ export default function UpdateProfilePage() {
                             }
                             placeholder="Your bio..."
                             _placeholder={{ color: "gray.500" }}
-                            type="email"
+                            type="text"
                         />
                     </FormControl>
                     <FormControl>

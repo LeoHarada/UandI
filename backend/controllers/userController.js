@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
 import bcrypt from "bcryptjs";
 import tokenAndCookie from "../utils/helpers/tokenAndCookie.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -20,7 +21,7 @@ const getUserProfile = async (req, res) => {
                 .select("-updatedAt");
         }
 
-        if (!user) return res.status(400).json({ error: "User not found." });
+        if (!user) return res.status(404).json({ error: "User not found." });
 
         res.status(200).json(user);
     } catch (err) {
@@ -34,9 +35,8 @@ const signupUser = async (req, res) => {
         const user = await User.findOne({ $or: [{ email }, { username }] });
 
         if (user) {
-            return res.status(400).json({ error: "User already exists." });
+            return res.status(400).json({ error: "User already exists" });
         }
-
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -50,6 +50,7 @@ const signupUser = async (req, res) => {
 
         if (newUser) {
             tokenAndCookie(newUser._id, res);
+
             res.status(201).json({
                 _id: newUser._id,
                 name: newUser.name,
@@ -62,7 +63,8 @@ const signupUser = async (req, res) => {
             res.status(400).json({ error: "Invalid user data" });
         }
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).json({ error: err.message });
+        console.log("Error in signupUser: ", err.message);
     }
 };
 
@@ -79,6 +81,11 @@ const loginUser = async (req, res) => {
             return res
                 .status(400)
                 .json({ error: "Invalid username or passowrd." });
+        }
+
+        if (user.isFrozen) {
+            user.isFrozen = false;
+            await user.save();
         }
 
         tokenAndCookie(user._id, res);
@@ -185,6 +192,18 @@ const updateUser = async (req, res) => {
         user.bio = bio || user.bio;
 
         user = await user.save();
+
+        await Post.updateMany(
+            { "replies.userId": userId },
+            {
+                $set: {
+                    "replies.$[reply].username": user.username,
+                    "replies.$[reply].userProfilePic": user.profilePic,
+                },
+            },
+            { arrayFilters: [{ "reply.userId": userId }] }
+        );
+
         user.password = null;
 
         res.status(200).json(user);
