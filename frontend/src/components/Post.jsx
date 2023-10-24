@@ -21,7 +21,9 @@ const Post = ({ post, postedBy }) => {
     useEffect(() => {
         const getUser = async () => {
             try {
-                const res = await fetch("/api/users/profile/" + postedBy);
+                const res = await fetch(
+                    `/${process.env.BACKEND_URL}/users/profile/` + postedBy
+                );
                 const data = await res.json();
 
                 if (data.error) {
@@ -43,9 +45,12 @@ const Post = ({ post, postedBy }) => {
             if (!window.confirm("Are you sure you want to delete this post?"))
                 return;
 
-            const res = await fetch(`/api/posts/${post._id}`, {
-                method: "DELETE",
-            });
+            const res = await fetch(
+                `/${process.env.BACKEND_URL}/posts/${post._id}`,
+                {
+                    method: "DELETE",
+                }
+            );
 
             const data = await res.json();
 
