@@ -6,11 +6,13 @@ import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import { v2 as cloudinary } from "cloudinary";
 
-dotenv.config();
-connectDB();
-const app = express();
+dotenv.config({ path: ".env" });
 
 const PORT = process.env.PORT || 5000;
+
+const app = express();
+
+connectDB();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

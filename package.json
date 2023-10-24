@@ -4,8 +4,8 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "dev": "nodemon server.js && vite",
-        "start": "node server.js",
+        "dev": "nodemon backend/server.js & vite",
+        "start": "node backend/server.js & vite",
         "build": "vite build",
         "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
         "preview": "vite preview"
