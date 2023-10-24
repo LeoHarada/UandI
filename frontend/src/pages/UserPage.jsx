@@ -20,7 +20,9 @@ const UserPage = () => {
             if (!user) return;
             setFetchingPosts(true);
             try {
-                const res = await fetch(`/posts/user/${username}`);
+                const res = await fetch(
+                    `${process.env.BACKEND_URL}/posts/user/${username}`
+                );
                 const data = await res.json();
                 setPosts(data);
             } catch (error) {
