@@ -5,17 +5,15 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import { v2 as cloudinary } from "cloudinary";
-import cors from "cors";
+import path from 'path';
 
 dotenv.config();
 
-const PORT = process.env.PORT || 5000;
+connectDB();
+
+const __dirname = path.resolve();
 
 const app = express();
-
-app.use(cors());
-
-connectDB();
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -24,12 +22,30 @@ cloudinary.config({
 });
 
 app.use(express.json({ limit: "50mb" }));
+
 app.use(express.urlencoded({ extended: true }));
+
 app.use(cookieParser());
+
+app.listen(3000, () => {
+    console.log('Server is running on port 3000!');
+  });
 
 app.use("/api/users", userRoutes);
 app.use("/api/posts", postRoutes);
 
-app.listen(PORT, () =>
-    console.log(`server started at http://localhost:${PORT}`)
-);
+app.use(express.static(path.join(__dirname, '/frontend/dist')));
+
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'frontend', 'dist', 'index.html'));
+  })
+
+app.use((err, req, res, next) => {
+    const statusCode = err.statusCode || 500;
+    const message = err.message || 'Internal Server Error';
+    return res.status(statusCode).json({
+      success: false,
+      statusCode,
+      message,
+    });
+  });
