@@ -5,12 +5,15 @@ import cookieParser from "cookie-parser";
 import userRoutes from "./routes/userRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import { v2 as cloudinary } from "cloudinary";
+import cors from "cors";
 
-dotenv.config({ path: ".env" });
+dotenv.config();
 
 const PORT = process.env.PORT || 5000;
 
 const app = express();
+
+app.use(cors());
 
 connectDB();
 
