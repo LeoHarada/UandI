@@ -33,9 +33,7 @@ const PostPage = () => {
         const getPost = async () => {
             setPosts([]);
             try {
-                const res = await fetch(
-                    `${process.env.BACKEND_URL}/posts/${pid}`
-                );
+                const res = await fetch(`/api/posts/${pid}`);
                 const data = await res.json();
 
                 if (data.error) {
